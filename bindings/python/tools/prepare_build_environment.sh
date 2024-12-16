@@ -6,6 +6,7 @@ set -x
 ROOT_DIR=$PWD
 ICU_ROOT=$ROOT_DIR/icu
 CMAKE_EXTRA_ARGS=""
+INSTALL_FOLDER=$1
 
 if [ "$CIBW_ARCHS" == "arm64" ]; then
 
@@ -43,6 +44,9 @@ pip install "cmake==3.18.*"
 rm -rf build
 mkdir build
 cd build
-cmake -DLIB_ONLY=ON -DICU_ROOT=$ICU_ROOT $CMAKE_EXTRA_ARGS ..
+cmake -DLIB_ONLY=ON -DICU_ROOT=$ICU_ROOT $CMAKE_EXTRA_ARGS -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER ..
 VERBOSE=1 make -j2 install
 cd $ROOT_DIR
+
+cd bindings/python
+CPPFLAGS="-I$INSTALL_FOLDER/include -L$INSTALL_FOLDER/lib" pip install .
